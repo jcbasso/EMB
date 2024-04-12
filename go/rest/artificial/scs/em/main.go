@@ -3,7 +3,7 @@ package main
 //evomaster:ignore
 
 import (
-	"github.com/jcbasso/EvoMaster-go/client-go/instrumentation/controller"
+	"github.com/jcbasso/EvoMaster/client-go/src/controller"
 	"log"
 )
 

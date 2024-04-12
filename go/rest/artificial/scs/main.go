@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jcbasso/EvoMaster-go/benchmark/rest/artificial/scs/src"
+	"github.com/jcbasso/EMB/go/rest/artificial/scs/src"
 	"log"
 	"net/http"
 )

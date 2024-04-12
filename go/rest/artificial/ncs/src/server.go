@@ -2,6 +2,7 @@ package src
 
 import (
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 func CreateServer() *mux.Router {
@@ -9,6 +10,7 @@ func CreateServer() *mux.Router {
 	r.HandleFunc("/swagger.json", SwaggerHandler)
 
 	api := r.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/health", func(_ http.ResponseWriter, _ *http.Request) { return })
 	api.HandleFunc("/triangle/{a}/{b}/{c}", TriangleClassificationHandler)
 	api.HandleFunc("/bessj/{n}/{x}", BessJHandler)
 	api.HandleFunc("/expint/{n}/{x}", ExpintHandler)

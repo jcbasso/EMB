@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/jcbasso/EvoMaster-go/benchmark/rest/artificial/scs/src/imp"
+	"github.com/jcbasso/EMB/go/rest/artificial/scs/src/imp"
 	"net/http"
 )
 

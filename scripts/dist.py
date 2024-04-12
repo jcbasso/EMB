@@ -8,17 +8,17 @@ import shutil
 import platform
 from shutil import copy
 from shutil import copytree
-from subprocess import run
+from subprocess import run, PIPE
 from os.path import expanduser
 import re
 
 MAKE_ZIP = False
 UPDATE = False
+SHELL = platform.system() == 'Windows'
 
 # handle maven
 MAVEN_VERSION_REGEX = "\d{1,2}\\.\d{1,2}\\.\d{1,2}"
 MAVEN_VERSION_ABOVE = "3.8.6"
-
 
 def checkMavenVersion():
     mvn_path = shutil.which("mvn")
@@ -69,8 +69,6 @@ PROJ_LOCATION = os.path.abspath(os.path.join(SCRIPT_LOCATION, os.pardir))
 JAVA_HOME_8 = os.environ.get('JAVA_HOME_8', '')
 JAVA_HOME_11 = os.environ.get('JAVA_HOME_11', '')
 JAVA_HOME_17 = os.environ.get('JAVA_HOME_17', '')
-
-SHELL = platform.system() == 'Windows'
 
 DIST = os.path.join(PROJ_LOCATION, "dist")
 
@@ -293,13 +291,13 @@ def buildJS(path, name):
 ####################
 def build_js_npm():
     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "ncs")), "js-rest-ncs")
-    buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "scs")), "js-rest-scs")
-    buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "cyclotron")), "cyclotron")
-    buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "disease-sh-api")), "disease-sh-api")
-    buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "realworld-app")), "realworld-app")
-    buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "spacex-api")), "spacex-api")
-    buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "graphql", "react-finland")), "react-finland")
-    buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "graphql", "ecommerce-server")), "ecommerce-server")
+#     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "scs")), "js-rest-scs")
+#     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "cyclotron")), "cyclotron")
+#     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "disease-sh-api")), "disease-sh-api")
+#     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "realworld-app")), "realworld-app")
+#     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "rest", "spacex-api")), "spacex-api")
+#     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "graphql", "react-finland")), "react-finland")
+#     buildJS(os.path.abspath(os.path.join(PROJ_LOCATION, "js_npm", "graphql", "ecommerce-server")), "ecommerce-server")
 
 
 ####################
@@ -355,22 +353,22 @@ if UPDATE:
     copyEvoMasterAgent()
     exit(0)
 
-checkJavaVersions()
+# checkJavaVersions()
 
-prepareDistFolder()
+# prepareDistFolder()
 
-build_jdk_8_maven()
-build_jdk_11_maven()
-build_jdk_17_maven()
-build_jdk_11_gradle()
-build_jdk_17_gradle()
+# build_jdk_8_maven()
+# build_jdk_11_maven()
+# build_jdk_17_maven()
+# build_jdk_11_gradle()
+# build_jdk_17_gradle()
 
 ## Those are disabled for now... might support back in the future
-# build_js_npm()
+build_js_npm()
 # build_dotnet_3()
 
 
-copyEvoMasterAgent()
+# copyEvoMasterAgent()
 
 if MAKE_ZIP:
     makeZip()

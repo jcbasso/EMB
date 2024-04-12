@@ -1,6 +1,10 @@
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
-github.com/jcbasso/EvoMaster-go/client-go/instrumentation v0.0.0-20231020124615-80b0c2498774 h1:8Mee1w6YKQMc8X8omEOIVmfZ7E2zdHG5+zUYMZtBDTA=
-github.com/jcbasso/EvoMaster-go/client-go/instrumentation v0.0.0-20231020124615-80b0c2498774/go.mod h1:ZwQPwm6Dq12jlLP2s6E84Mz+C6aBirEkEiRHUDxGDlQ=
-golang.org/x/tools v0.11.0 h1:EMCa6U9S2LtZXLAMoWiR/R8dAQFRqbAitmbJ2UKhoi8=
-golang.org/x/tools v0.11.0/go.mod h1:anzJrxPjNtfgiYQYirP2CPGzGLxrH2u2QBhn6Bf3qY8=
+github.com/jcbasso/EvoMaster/client-go v0.0.0-20240105145808-c041975eba73 h1:RoKmQP/ORI1MMYcpNNxnxF+RHXIjALePaN6xxvX7XkU=
+github.com/jcbasso/EvoMaster/client-go v0.0.0-20240105145808-c041975eba73/go.mod h1:QNSXMRJtuHRKe3i8WlTajbSgsLPDtMUaN4gOXY2uP+4=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
+golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa h1:FRnLl4eNAQl8hwxVVC17teOw8kdjVDVAiFMtgUdTSRQ=
+golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa/go.mod h1:zk2irFbV9DP96SEBUUAy67IdHUaZuSnrz1n472HUCLE=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=

@@ -4,10 +4,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/jcbasso/EvoMaster-go/benchmark/rest/artificial/scs/src"
-	"github.com/jcbasso/EvoMaster-go/client-go/instrumentation/controller"
-	"github.com/jcbasso/EvoMaster-go/client-go/instrumentation/controller/api/dto"
-	"github.com/jcbasso/EvoMaster-go/client-go/instrumentation/controller/api/dto/problem"
+	"github.com/jcbasso/EMB/go/rest/artificial/scs/src"
+	"github.com/jcbasso/EvoMaster/client-go/src/controller"
+	"github.com/jcbasso/EvoMaster/client-go/src/controller/api/dto"
+	"github.com/jcbasso/EvoMaster/client-go/src/controller/api/dto/problem"
 	"log"
 	"net/http"
 )

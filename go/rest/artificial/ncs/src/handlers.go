@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/jcbasso/EMB/benchmark/rest/artificial/ncs/src/imp"
+	"github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp"
 	"net/http"
 )
 

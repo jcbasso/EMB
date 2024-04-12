@@ -159,7 +159,7 @@ hs_err_pid*
 
 ### JavaScript
 /venv/
-/js_npm/evomaster-client-js/
+/js_npm/rest/ncs/evomaster-client-js/
 /js_npm/rest/ncs/build/
 /js_npm/rest/ncs/instrumented/
 /js_npm/rest/ncs/node_modules/

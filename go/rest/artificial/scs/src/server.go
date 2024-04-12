@@ -9,7 +9,7 @@ func CreateServer() http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/swagger.json", SwaggerHandler)
 
-	api := mux.NewRouter().PathPrefix("/api").Subrouter()
+	api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/calc/{op}/{arg1}/{arg2}", CalcHandler)
 	api.HandleFunc("/cookie/{name}/{val}/{site}", CookieHandler)         // string / string / string
 	api.HandleFunc("/costfuns/{i}/{s}", CostFunsHandler)                 // int32 / string

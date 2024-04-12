@@ -29,7 +29,7 @@
       "src"
     ],
     "plugins": [
-      "module:evomaster-client-js"
+      "./evomaster-client-js"
     ]
   },
   "jest": {
