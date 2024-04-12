@@ -1,16 +1,24 @@
 package em.external.reservationsapi;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import org.evomaster.client.java.controller.AuthUtils;
 import org.evomaster.client.java.controller.ExternalSutController;
 import org.evomaster.client.java.controller.InstrumentedSutStarter;
-import org.evomaster.client.java.controller.api.dto.AuthenticationDto;
+import org.evomaster.client.java.controller.api.dto.auth.AuthenticationDto;
 import org.evomaster.client.java.controller.api.dto.SutInfoDto;
-import org.evomaster.client.java.controller.internal.db.DbSpecification;
+import org.evomaster.client.java.sql.DbSpecification;
 import org.evomaster.client.java.controller.problem.ProblemInfo;
 import org.evomaster.client.java.controller.problem.RestProblem;
 import org.testcontainers.containers.GenericContainer;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ExternalEvoMasterController extends ExternalSutController {
@@ -60,10 +68,16 @@ public class ExternalEvoMasterController extends ExternalSutController {
     //https://www.mongodb.com/docs/drivers/java/sync/current/compatibility/
     private static final String MONGODB_VERSION = "4.4";
 
-    private static final String MONGODB_DATABASE_NAME = "Reservations";
+    private static final String MONGODB_DATABASE_NAME = "reservations-api";
 
-    private static final GenericContainer mongodbContainer = new GenericContainer("mongo:" + MONGODB_VERSION)
+    private static final GenericContainer mongodbContainer = new GenericContainer("bitnami/mongodb:" + MONGODB_VERSION)
+            .withTmpFs(Collections.singletonMap("/bitnami/mongodb", "rw"))
+            .withEnv("MONGODB_REPLICA_SET_MODE", "primary")
+            .withEnv("ALLOW_EMPTY_PASSWORD", "yes")
             .withExposedPorts(MONGODB_PORT);
+
+    private static final String rawPassword = "bar123";
+    private static final String hashedPassword = "$2a$10$nEDY5j731yXGnQHyM39PWurJWr1FukegmKYYarK5WOoAMmgDs6D3u";
 
     private String mongoDbUrl;
 
@@ -101,7 +115,8 @@ public class ExternalEvoMasterController extends ExternalSutController {
         return new String[]{
                 "--server.port=" + sutPort,
                 "--databaseUrl="+mongoDbUrl,
-                "--spring.data.mongodb.uri="+mongoDbUrl
+                "--spring.data.mongodb.uri="+mongoDbUrl,
+                "--app.jwt.secret=abcdef012345678901234567890123456789abcdef012345678901234567890123456789"
         };
     }
 
@@ -138,11 +153,72 @@ public class ExternalEvoMasterController extends ExternalSutController {
 
     @Override
     public void postStart() {
+        try {
+            Thread.sleep(3_000);
+        } catch (InterruptedException e) {
+            // do nothing
+        }
+
+        while (!isMongoClientReady()) {
+            try {
+                Thread.sleep(1_000);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
+        }
+    }
+
+    /**
+     * Checks if the mongo database is ready to receive commands using a ping command
+     * @return
+     */
+    private boolean isMongoClientReady() {
+        try {
+            MongoDatabase db = mongoClient.getDatabase(MONGODB_DATABASE_NAME);
+            Document pingResult = db.runCommand(new Document("ping", 1));
+            return pingResult.getDouble("ok") == 1.0;
+        } catch (Exception ex) {
+            // Connection error
+            return false;
+        }
     }
 
     @Override
     public void resetStateOfSUT() {
-        mongoClient.getDatabase(MONGODB_DATABASE_NAME).drop();
+        MongoDatabase db = mongoClient.getDatabase(MONGODB_DATABASE_NAME);
+
+        //THIS WAS VERY EXPENSIVE
+        //db.drop();
+
+        for(String name: db.listCollectionNames()){
+            db.getCollection(name).deleteMany(new BasicDBObject());
+        }
+
+        MongoCollection<Document> users = db.getCollection("users");
+        users.insertMany(Arrays.asList(
+                new Document()
+                        .append("_id", new ObjectId())
+                        .append("_class", "sk.cyrilgavala.reservationsApi.model.User")
+                        .append("username", "foo")
+                        .append("email", "foo@foo.com")
+                        .append("password", hashedPassword)
+                        .append("role", "USER"),
+                new Document()
+                        .append("_id", new ObjectId())
+                        .append("_class", "sk.cyrilgavala.reservationsApi.model.User")
+                        .append("username", "bar")
+                        .append("email", "bar@foo.com")
+                        .append("password", hashedPassword)
+                        .append("role", "USER"),
+                new Document()
+                        .append("_id", new ObjectId())
+                        .append("_class", "sk.cyrilgavala.reservationsApi.model.User")
+                        .append("username", "admin")
+                        .append("email", "admin@foo.com")
+                        .append("password", hashedPassword)
+                        .append("role", "ADMIN")
+        ));
+
     }
 
     @Override
@@ -178,11 +254,38 @@ public class ExternalEvoMasterController extends ExternalSutController {
 
     @Override
     public List<AuthenticationDto> getInfoForAuthentication() {
-        return null;
+
+        return Arrays.asList(
+                AuthUtils.getForJsonTokenBearer(
+                        "admin",
+                        "/api/user/login",
+                        "{\"username\":\"admin\", \"password\":\""+rawPassword+"\"}",
+                        "/accessToken"
+                ),
+                AuthUtils.getForJsonTokenBearer(
+                        "foo",
+                        "/api/user/login",
+                        "{\"username\":\"foo\", \"password\":\""+rawPassword+"\"}",
+                        "/accessToken"
+                ),
+                AuthUtils.getForJsonTokenBearer(
+                        "bar",
+                        "/api/user/login",
+                        "{\"username\":\"bar\", \"password\":\""+rawPassword+"\"}",
+                        "/accessToken"
+                )
+        );
     }
 
     @Override
     public List<DbSpecification> getDbSpecifications() {
         return null;
     }
+
+    @Override
+    public Object getMongoConnection() {
+        return mongoClient;
+    }
+
+
 }

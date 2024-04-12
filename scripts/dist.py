@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-EVOMASTER_VERSION = "2.0.0"
+EVOMASTER_VERSION = "3.0.0"
 
 import sys
 import os
@@ -21,17 +21,34 @@ MAVEN_VERSION_ABOVE = "3.8.6"
 
 
 def checkMavenVersion():
-    mvn_txt = re.search(MAVEN_VERSION_REGEX, shutil.which("mvn")).group()
-    mvn_version = mvn_txt.split(".")
-    if len(mvn_version) != 3:
-        print("\nERROR: Cannot find maven with `which mvn`:" + mvn_txt)
+    mvn_path = shutil.which("mvn")
+    if mvn_path == None:
+        print("\nERROR: Cannot find maven with `which mvn`")
         exit(1)
+
+    match = re.search(MAVEN_VERSION_REGEX, mvn_path)
+    if match == None:
+        print("\nCannot determine mvn version from its path location: " + mvn_path)
+#        might happen depending on installation path... instead of crashing immediately,
+#        we try to build, as it might be the correct version... if not, it will fail anyway
+#  TODO ideally, should rather use "mvn -v" to determine the version number...
+#  although it would be bit tricky to implement (so not super important)
+        return True
+#         exit(1)
+
+    mvn_txt = match.group()
+    mvn_version = mvn_txt.split(".")
+
+    print("\nDetected mvn version based on its path location: " + mvn_txt)
+
     above = MAVEN_VERSION_ABOVE.split(".")
     for index, v in enumerate(mvn_version):
-        if int(above[index]) > int(v):
+        if int(above[index]) < int(v):
             return True
+        elif int(above[index]) > int(v):
+            return False
 
-    return False
+    return True #  same
 
 
 if not checkMavenVersion():
@@ -130,6 +147,9 @@ def build_jdk_8_maven():
 
     copy(folder + "/cs/rest/original/restcountries/target/restcountries-sut.jar", DIST)
     copy(folder + "/em/external/rest/restcountries/target/restcountries-evomaster-runner.jar", DIST)
+
+    copy(folder + "/cs/rest/original/session-service/target/session-service-sut.jar", DIST)
+    copy(folder + "/em/external/rest/session-service/target/session-service-evomaster-runner.jar", DIST)
 
     copy(folder + "/cs/rest-gui/gestaohospital/target/gestaohospital-rest-sut.jar", DIST)
     copy(folder + "/em/external/rest/gestaohospital/target/gestaohospital-rest-evomaster-runner.jar", DIST)

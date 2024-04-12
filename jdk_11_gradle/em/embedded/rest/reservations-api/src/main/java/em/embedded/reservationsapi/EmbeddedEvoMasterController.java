@@ -1,12 +1,18 @@
 package em.embedded.reservationsapi;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import org.evomaster.client.java.controller.AuthUtils;
 import org.evomaster.client.java.controller.EmbeddedSutController;
 import org.evomaster.client.java.controller.InstrumentedSutStarter;
-import org.evomaster.client.java.controller.api.dto.AuthenticationDto;
+import org.evomaster.client.java.controller.api.dto.auth.AuthenticationDto;
 import org.evomaster.client.java.controller.api.dto.SutInfoDto;
-import org.evomaster.client.java.controller.internal.db.DbSpecification;
+import org.evomaster.client.java.sql.DbSpecification;
 import org.evomaster.client.java.controller.problem.ProblemInfo;
 import org.evomaster.client.java.controller.problem.RestProblem;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +20,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.testcontainers.containers.GenericContainer;
 import sk.cyrilgavala.reservationsApi.ReservationsApi;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,10 +52,21 @@ public class EmbeddedEvoMasterController extends EmbeddedSutController {
     //https://www.mongodb.com/docs/drivers/java/sync/current/compatibility/
     private static final String MONGODB_VERSION = "4.4";
 
-    private static final String MONGODB_DATABASE_NAME = "Reservations";
+    private static final String MONGODB_DATABASE_NAME = "reservations-api";
 
-    private static final GenericContainer mongodbContainer = new GenericContainer("mongo:" + MONGODB_VERSION)
+    //  docker run -p 27017:27017  -e MONGODB_REPLICA_SET_MODE=primary -e  ALLOW_EMPTY_PASSWORD=yes bitnami/mongodb:4.4
+    //  https://hub.docker.com/r/bitnami/mongodb
+    // cannot use standard Mongo image, due ridiculous handling of transaction that requires a cluster...
+
+    private static final GenericContainer mongodbContainer = new GenericContainer("bitnami/mongodb:" + MONGODB_VERSION)
+            .withTmpFs(Collections.singletonMap("/bitnami/mongodb", "rw"))
+            .withEnv("MONGODB_REPLICA_SET_MODE", "primary")
+            .withEnv("ALLOW_EMPTY_PASSWORD", "yes")
             .withExposedPorts(MONGODB_PORT);
+
+
+    private static final String rawPassword = "bar123";
+    private static final String hashedPassword = "$2a$10$nEDY5j731yXGnQHyM39PWurJWr1FukegmKYYarK5WOoAMmgDs6D3u";
 
     private String mongoDbUrl;
 
@@ -69,16 +88,44 @@ public class EmbeddedEvoMasterController extends EmbeddedSutController {
         mongoDbUrl = "mongodb://" + mongodbContainer.getContainerIpAddress() + ":" + mongodbContainer.getMappedPort(MONGODB_PORT) + "/" + MONGODB_DATABASE_NAME;
         mongoClient = MongoClients.create(mongoDbUrl);
 
-
-
         ctx = SpringApplication.run(ReservationsApi.class,
                 new String[]{"--server.port=0",
-                        "--databaseUrl="+mongoDbUrl,
-                        "--spring.data.mongodb.uri="+mongoDbUrl,
-                        "--spring.cache.type=NONE"
+                        "--databaseUrl=" + mongoDbUrl,
+                        "--spring.data.mongodb.uri=" + mongoDbUrl,
+                        "--spring.cache.type=NONE",
+                        "--app.jwt.secret=abcdef012345678901234567890123456789abcdef012345678901234567890123456789"
                 });
 
+        try {
+            Thread.sleep(3_000);
+        } catch (InterruptedException e) {
+            // do nothing
+        }
+
+        while (!isMongoClientReady()) {
+            try {
+                Thread.sleep(1_000);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
+        }
+
         return "http://localhost:" + getSutPort();
+    }
+
+    /**
+     * Checks if the mongo database is ready to receive commands using a ping command
+     * @return
+     */
+    private boolean isMongoClientReady() {
+        try {
+            MongoDatabase db = mongoClient.getDatabase(MONGODB_DATABASE_NAME);
+            Document pingResult = db.runCommand(new Document("ping", 1));
+            return pingResult.getDouble("ok") == 1.0;
+        } catch (Exception ex) {
+            // Connection error
+            return false;
+        }
     }
 
     protected int getSutPort() {
@@ -108,7 +155,40 @@ public class EmbeddedEvoMasterController extends EmbeddedSutController {
 
     @Override
     public void resetStateOfSUT() {
-        mongoClient.getDatabase(MONGODB_DATABASE_NAME).drop();
+
+        MongoDatabase db = mongoClient.getDatabase(MONGODB_DATABASE_NAME);
+
+        //THIS WAS VERY EXPENSIVE for this API... might be due to transactions or different Docker image?
+        //db.drop();
+
+        for(String name: db.listCollectionNames()){
+            db.getCollection(name).deleteMany(new BasicDBObject());
+        }
+
+        MongoCollection<Document> users = db.getCollection("users");
+        users.insertMany(Arrays.asList(
+                new Document()
+                        .append("_id", new ObjectId())
+                        .append("_class", "sk.cyrilgavala.reservationsApi.model.User")
+                        .append("username", "foo")
+                        .append("email", "foo@foo.com")
+                        .append("password", hashedPassword)
+                        .append("role", "USER"),
+                new Document()
+                        .append("_id", new ObjectId())
+                        .append("_class", "sk.cyrilgavala.reservationsApi.model.User")
+                        .append("username", "bar")
+                        .append("email", "bar@foo.com")
+                        .append("password", hashedPassword)
+                        .append("role", "USER"),
+                new Document()
+                        .append("_id", new ObjectId())
+                        .append("_class", "sk.cyrilgavala.reservationsApi.model.User")
+                        .append("username", "admin")
+                        .append("email", "admin@foo.com")
+                        .append("password", hashedPassword)
+                        .append("role", "ADMIN")
+        ));
     }
 
     @Override
@@ -119,11 +199,27 @@ public class EmbeddedEvoMasterController extends EmbeddedSutController {
 
     @Override
     public List<AuthenticationDto> getInfoForAuthentication() {
-        //TODO might need to setup JWT headers here
-        return null;
+        return Arrays.asList(
+                AuthUtils.getForJsonTokenBearer(
+                        "admin",
+                        "/api/user/login",
+                        "{\"username\":\"admin\", \"password\":\""+rawPassword+"\"}",
+                        "/accessToken"
+                ),
+                AuthUtils.getForJsonTokenBearer(
+                        "foo",
+                        "/api/user/login",
+                        "{\"username\":\"foo\", \"password\":\""+rawPassword+"\"}",
+                        "/accessToken"
+                ),
+                AuthUtils.getForJsonTokenBearer(
+                        "bar",
+                        "/api/user/login",
+                        "{\"username\":\"bar\", \"password\":\""+rawPassword+"\"}",
+                        "/accessToken"
+                )
+        );
     }
-
-
 
 
     @Override
@@ -139,5 +235,9 @@ public class EmbeddedEvoMasterController extends EmbeddedSutController {
         return SutInfoDto.OutputFormat.JAVA_JUNIT_4;
     }
 
+    @Override
+    public Object getMongoConnection() {
+        return mongoClient;
+    }
 
 }
