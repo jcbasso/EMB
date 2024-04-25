@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="js_npm em ncs" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/js_npm/rest/ncs/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="em:run" />
+    </scripts>
+    <node-interpreter value="project" />
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>

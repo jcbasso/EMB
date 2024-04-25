@@ -1,0 +1,835 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>src: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/handlers.go (80.0%)</option>
+				
+				<option value="file1">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp/bessj.go (42.7%)</option>
+				
+				<option value="file2">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp/expint.go (43.9%)</option>
+				
+				<option value="file3">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp/fisher.go (62.5%)</option>
+				
+				<option value="file4">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp/gammq.go (48.5%)</option>
+				
+				<option value="file5">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp/remainder.go (36.0%)</option>
+				
+				<option value="file6">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp/triangle_classification.go (50.0%)</option>
+				
+				<option value="file7">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp/utils.go (33.3%)</option>
+				
+				<option value="file8">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/server.go (100.0%)</option>
+				
+				<option value="file9">github.com/jcbasso/EMB/go/rest/artificial/ncs/src/utils.go (89.5%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package src
+
+import (
+        _ "embed"
+        "encoding/json"
+        "fmt"
+        "github.com/gorilla/mux"
+        "github.com/jcbasso/EMB/go/rest/artificial/ncs/src/imp"
+        "net/http"
+)
+
+func TriangleClassificationHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        type request struct {
+                A int32 `json:"a,string"`
+                B int32 `json:"b,string"`
+                C int32 `json:"c,string"`
+        }
+
+        jsonVars, _ := json.Marshal(mux.Vars(r))
+
+        var req request
+        err := json.Unmarshal(jsonVars, &amp;req)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">res := imp.TriangleClassify(req.A, req.B, req.C)
+        writeResponse(w, IntegerDto{res}, nil)</span>
+}
+
+func BessJHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        type request struct {
+                N int32   `json:"n,string"`
+                X float64 `json:"x,string"`
+        }
+
+        jsonVars, _ := json.Marshal(mux.Vars(r))
+
+        var req request
+        err := json.Unmarshal(jsonVars, &amp;req)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">if req.N &lt;= 2 || req.N &gt; 1000 </span><span class="cov8" title="1">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">res, err := imp.Bessj(req.N, req.X)
+        writeResponse(w, DoubleDto{res}, err)</span>
+}
+
+func ExpintHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        type request struct {
+                N int32   `json:"n,string"`
+                X float64 `json:"x,string"`
+        }
+
+        jsonVars, _ := json.Marshal(mux.Vars(r))
+
+        var req request
+        err := json.Unmarshal(jsonVars, &amp;req)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">res, err := imp.Expint(req.N, req.X)
+        writeResponse(w, DoubleDto{res}, err)</span>
+}
+
+func FisherHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        type request struct {
+                M int32   `json:"m,string"`
+                N int32   `json:"n,string"`
+                X float64 `json:"x,string"`
+        }
+
+        jsonVars, _ := json.Marshal(mux.Vars(r))
+
+        var req request
+        err := json.Unmarshal(jsonVars, &amp;req)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">if req.M &gt; 1000 || req.N &gt; 1000 </span><span class="cov8" title="1">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">res := imp.Fisher(req.M, req.N, req.X)
+        writeResponse(w, DoubleDto{res}, nil)</span>
+}
+
+func GammqHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        type request struct {
+                A float64 `json:"a,string"`
+                X float64 `json:"x,string"`
+        }
+
+        jsonVars, _ := json.Marshal(mux.Vars(r))
+
+        var req request
+        err := json.Unmarshal(jsonVars, &amp;req)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">gammq := imp.NewGammq()
+        res, err := gammq.Exe(req.A, req.X)
+        writeResponse(w, DoubleDto{res}, err)</span>
+}
+
+func RemainderHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        type request struct {
+                A int32 `json:"a,string"`
+                B int32 `json:"b,string"`
+        }
+
+        jsonVars, _ := json.Marshal(mux.Vars(r))
+
+        var req request
+        err := json.Unmarshal(jsonVars, &amp;req)
+        if err != nil </span><span class="cov0" title="0">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">var lim int32 = 10_000
+        if req.A &gt; lim || req.A &lt; -lim || req.B &lt; -lim </span><span class="cov8" title="1">{
+                badRequestResponse(w, "")
+                return
+        }</span>
+
+        <span class="cov8" title="1">res := imp.Remainder(req.A, req.B)
+        writeResponse(w, IntegerDto{res}, nil)</span>
+}
+
+//go:embed swagger.json
+var swaggerJSON []byte
+
+func SwaggerHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        _, err := fmt.Fprintf(w, string(swaggerJSON))
+        if err != nil </span><span class="cov0" title="0">{
+                internalServerResponse(w)
+                return
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package imp
+
+import (
+        "fmt"
+        "math"
+)
+
+const BESSJ_ACC float64 = 40.0
+const BESSJ_BIGNO float64 = 1.0e10
+const BESSJ_BIGNI float64 = 1.0e-10
+
+func Bessj(n int32, x float64) (float64, error) <span class="cov8" title="1">{
+        var j, jsum, m int32
+        var ax, bj, bjm, bjp, sum, tox, ans float64
+
+        if n &lt; 2 </span><span class="cov0" title="0">{
+                return 0, fmt.Errorf("index n less than 2 in bessj")
+        }</span>
+
+        <span class="cov8" title="1">ax = math.Abs(x)
+
+        if ax == 0.0 </span><span class="cov0" title="0">{
+                return 0.0, nil
+        }</span> else<span class="cov8" title="1"> if ax &gt; float64(n) </span><span class="cov0" title="0">{
+                tox = 2.0 / ax
+                bjm = bessj0(ax)
+                bj = bessj1(ax)
+
+                for j = 1; j &lt; n; j++ </span><span class="cov0" title="0">{
+                        bjp = float64(j)*tox*bj - bjm
+                        bjm = bj
+                        bj = bjp
+                }</span>
+
+                <span class="cov0" title="0">ans = bj</span>
+        } else<span class="cov8" title="1"> {
+                tox = 2.0 / ax
+                m = 2 * ((n + int32(math.Round(math.Sqrt(BESSJ_ACC*float64(n))))) / 2)
+                jsum = 0
+                bjp = 0.0
+                ans = 0.0
+                sum = 0.0
+                bj = 1.0
+
+                for j = m; j &gt; 0; j-- </span><span class="cov8" title="1">{
+                        bjm = float64(j)*tox*bj - bjp
+                        bjp = bj
+                        bj = bjm
+
+                        if math.Abs(bj) &gt; BESSJ_BIGNO </span><span class="cov8" title="1">{
+                                bj *= BESSJ_BIGNI
+                                bjp *= BESSJ_BIGNI
+                                ans *= BESSJ_BIGNI
+                                sum *= BESSJ_BIGNI
+                        }</span>
+
+                        <span class="cov8" title="1">if jsum != 0 </span><span class="cov8" title="1">{
+                                sum += bj
+                                jsum = 0
+                        }</span> else<span class="cov8" title="1"> {
+                                jsum = 1
+                        }</span>
+
+                        <span class="cov8" title="1">if j == n </span><span class="cov8" title="1">{
+                                ans = bjp
+                        }</span>
+                }
+
+                <span class="cov8" title="1">sum = 2.0*sum - bj
+                ans /= sum</span>
+        }
+
+        <span class="cov8" title="1">if x &lt; 0.0 &amp;&amp; (n&amp;1) != 0 </span><span class="cov0" title="0">{
+                return -ans, nil
+        }</span>
+
+        <span class="cov8" title="1">return ans, nil</span>
+}
+
+func bessj0(x float64) float64 <span class="cov0" title="0">{
+        var ax, z float64
+        var xx, y, ans, ans1, ans2 float64
+
+        ax = math.Abs(x)
+        if ax &lt; 8.0 </span><span class="cov0" title="0">{
+                y = x * x
+                ans1 = 57568490574.0 + y*(-13362590354.0+y*(651619640.7+y*(-11214424.18+y*(77392.33017+y*(-184.9052456)))))
+                ans2 = 57568490411.0 + y*(1029532985.0+y*(9494680.718+y*(59272.64853+y*(267.8532712+y*1.0))))
+                ans = ans1 / ans2
+        }</span> else<span class="cov0" title="0"> {
+                z = 8.0 / ax
+                y = z * z
+                xx = ax - 0.785398164
+                ans1 = 1.0 + y*(-0.1098628627e-2+y*(0.2734510407e-4+y*(-0.2073370639e-5+y*0.2093887211e-6)))
+                ans2 = -0.1562499995e-1 + y*(0.1430488765e-3+y*(-0.6911147651e-5+y*(0.7621095161e-6-y*0.934935152e-7)))
+                ans = math.Sqrt(0.636619772/ax) * (math.Cos(xx)*ans1 - z*math.Sin(xx)*ans2)
+        }</span>
+        <span class="cov0" title="0">return ans</span>
+}
+
+func bessj1(x float64) float64 <span class="cov0" title="0">{
+        var ax, z float64
+        var xx, y, ans, ans1, ans2 float64
+
+        ax = math.Abs(x)
+        if ax &lt; 8.0 </span><span class="cov0" title="0">{
+                y = x * x
+                ans1 = x * (72362614232.0 + y*(-7895059235.0+y*(242396853.1+y*(-2972611.439+y*(15704.48260+y*(-30.16036606))))))
+                ans2 = 144725228442.0 + y*(2300535178.0+y*(18583304.74+y*(99447.43394+y*(376.9991397+y*1.0))))
+                ans = ans1 / ans2
+        }</span> else<span class="cov0" title="0"> {
+                z = 8.0 / ax
+                y = z * z
+                xx = ax - 2.356194491
+                ans1 = 1.0 + y*(0.183105e-2+y*(-0.3516396496e-4+y*(0.2457520174e-5+y*(-0.240337019e-6))))
+                ans2 = 0.04687499995 + y*(-0.2002690873e-3+y*(0.8449199096e-5+y*(-0.88228987e-6+y*0.105787412e-6)))
+                ans = math.Sqrt(0.636619772/ax) * (math.Cos(xx)*ans1 - z*math.Sin(xx)*ans2)
+                if x &lt; 0.0 </span><span class="cov0" title="0">{
+                        ans = -ans
+                }</span>
+        }
+
+        <span class="cov0" title="0">return ans</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package imp
+
+import (
+        "fmt"
+        "math"
+)
+
+const EXPINT_MAXIT float64 = 100
+const EXPINT_EULER float64 = 0.5772156649
+const EXPINT_FPMIN float64 = 1.0e-30
+const EXPINT_EPS float64 = 1.0e-7
+
+func Expint(n int32, x float64) (float64, error) <span class="cov8" title="1">{
+        var i, ii, nm1 int32
+        var a, b, c, d, del, fact, h, psi, ans float64
+
+        nm1 = n - 1
+
+        if n &lt; 0 || x &lt; 0.0 || (x == 0.0 &amp;&amp; (n == 0 || n == 1)) </span><span class="cov8" title="1">{
+                return 0, fmt.Errorf("error: n &lt; 0 or x &lt; 0")
+        }</span> else<span class="cov8" title="1"> {
+                if n == 0 </span><span class="cov0" title="0">{
+                        ans = math.Exp(-x) / x
+                }</span> else<span class="cov8" title="1"> {
+                        if x == 0.0 </span><span class="cov0" title="0">{
+                                ans = 1.0 / float64(nm1)
+                        }</span> else<span class="cov8" title="1"> {
+                                if x &gt; 1.0 </span><span class="cov0" title="0">{
+                                        b = x + float64(n)
+                                        c = 1.0 / EXPINT_FPMIN
+                                        d = 1.0 / b
+                                        h = d
+
+                                        for i = 1; float64(i) &lt;= EXPINT_MAXIT; i++ </span><span class="cov0" title="0">{
+                                                a = float64(-i * (nm1 + i))
+                                                b += 2.0
+                                                d = 1.0 / (a*d + b)
+                                                c = b + a/c
+                                                del = c * d
+                                                h *= del
+
+                                                if math.Abs(del-1.0) &lt; EXPINT_EPS </span><span class="cov0" title="0">{
+                                                        return h * math.Exp(-x), nil
+                                                }</span>
+                                        }
+
+                                        <span class="cov0" title="0">return 0, fmt.Errorf("continued fraction failed in expint")</span>
+                                } else<span class="cov8" title="1"> {
+                                        if nm1 != 0 </span><span class="cov8" title="1">{
+                                                ans = 1.0 / float64(nm1)
+                                        }</span> else<span class="cov0" title="0"> {
+                                                ans = -math.Log(x) - EXPINT_EULER
+                                        }</span>
+                                        <span class="cov8" title="1">fact = 1.0
+
+                                        for i = 1; float64(i) &lt;= EXPINT_MAXIT; i++ </span><span class="cov8" title="1">{
+                                                fact *= -x / float64(i)
+
+                                                if i != nm1 </span><span class="cov8" title="1">{
+                                                        del = -fact / float64(i-nm1)
+                                                }</span> else<span class="cov0" title="0"> {
+                                                        psi = -EXPINT_EULER
+
+                                                        for ii = 1; ii &lt;= nm1; ii++ </span><span class="cov0" title="0">{
+                                                                psi += 1.0 / float64(ii)
+                                                        }</span>
+
+                                                        <span class="cov0" title="0">del = fact * (-math.Log(x) + psi)</span>
+                                                }
+
+                                                <span class="cov8" title="1">ans += del
+
+                                                if math.Abs(del) &lt; math.Abs(ans)*EXPINT_EPS </span><span class="cov8" title="1">{
+                                                        return ans, nil
+                                                }</span>
+                                        }
+
+                                        <span class="cov0" title="0">return 0, fmt.Errorf("series failed in expint")</span>
+                                }
+                        }
+                }
+        }
+        <span class="cov0" title="0">return ans, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package imp
+
+import "math"
+
+func Fisher(n int32, m int32, x float64) float64 <span class="cov8" title="1">{
+        var a, b, i, j int32
+        var w, y, z, zk, d, p float64
+
+        a = 2*(m/2) - m + 2
+        b = 2*(n/2) - n + 2
+        w = (x * float64(m)) / float64(n)
+        z = 1.0 / (1.0 + w)
+
+        if a == 1 </span><span class="cov8" title="1">{
+                if b == 1 </span><span class="cov0" title="0">{
+                        p = math.Sqrt(w)
+                        y = 0.3183098862
+                        d = y * z / p
+                        p = 2.0 * y * math.Atan(p)
+                }</span> else<span class="cov8" title="1"> {
+                        p = math.Sqrt(w * z)
+                        d = 0.5 * p * z / w
+                }</span>
+        } else<span class="cov0" title="0"> if b == 1 </span><span class="cov0" title="0">{
+                p = math.Sqrt(z)
+                d = 0.5 * z * p
+                p = 1.0 - p
+        }</span> else<span class="cov0" title="0"> {
+                d = z * z
+                p = w * z
+        }</span>
+
+        <span class="cov8" title="1">y = 2.0 * w / z
+
+        if a == 1 </span><span class="cov8" title="1">{
+                for j = b + 2; j &lt;= n; j += 2 </span><span class="cov8" title="1">{
+                        d *= (1.0 + 1.0/float64(j-2)) * z
+                        p += d * y / float64(j-1)
+                }</span>
+        } else<span class="cov0" title="0"> {
+                zk = math.Pow(z, float64((n-1)/2))
+                d *= (zk * float64(n)) / float64(b)
+                p = p*zk + w*z*(zk-1.0)/(z-1.0)
+        }</span>
+
+        <span class="cov8" title="1">y = w * z
+        z = 2.0 / z
+        b = n - 2
+        for i = a + 2; i &lt;= m; i += 2 </span><span class="cov8" title="1">{
+                j = i + b
+                d *= (y * float64(j)) / float64(i-2)
+                p -= z * d / float64(j)
+        }</span>
+
+        <span class="cov8" title="1">if p &lt; 0.0 </span><span class="cov0" title="0">{
+                return 0.0
+        }</span>
+        <span class="cov8" title="1">if p &gt; 1.0 </span><span class="cov0" title="0">{
+                return 1.0
+        }</span>
+
+        <span class="cov8" title="1">return p</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package imp
+
+import (
+        "fmt"
+        "math"
+)
+
+const GAMMQ_ITMAX = 100
+const GAMMQ_EPS float64 = 3.0e-7
+const GAMMQ_FPMIN = 1.0e-30
+
+type Gammq struct {
+        gamser float64
+        gammcf float64
+        gln    float64
+}
+
+func NewGammq() Gammq <span class="cov8" title="1">{
+        return Gammq{}
+}</span>
+
+func (g *Gammq) Exe(a float64, x float64) (float64, error) <span class="cov8" title="1">{
+        if x &lt; 0.0 || a &lt;= 0.0 </span><span class="cov8" title="1">{
+                return 0, fmt.Errorf("invalid arguments in routine gammq")
+        }</span>
+        <span class="cov8" title="1">if x &lt; (a + 1.0) </span><span class="cov8" title="1">{
+                err := g.gser(a, x)
+                if err != nil </span><span class="cov0" title="0">{
+                        return 0, err
+                }</span>
+
+                <span class="cov8" title="1">return 1 - g.gamser, nil</span>
+        } else<span class="cov0" title="0"> {
+                err := g.gcf(a, x)
+                if err != nil </span><span class="cov0" title="0">{
+                        return 0, err
+                }</span>
+
+                <span class="cov0" title="0">return g.gammcf, nil</span>
+        }
+}
+
+func (g *Gammq) gser(a float64, x float64) error <span class="cov8" title="1">{
+        var n int64
+        var sum, del, ap float64
+
+        g.gln = g.gammln(a)
+
+        if x &lt;= 0.0 </span><span class="cov0" title="0">{
+                if x &lt; 0.0 </span><span class="cov0" title="0">{
+                        return fmt.Errorf("x less than 0 in routine gser")
+                }</span>
+                <span class="cov0" title="0">g.gamser = 0.0
+                return nil</span>
+        } else<span class="cov8" title="1"> {
+                ap = a
+                del = 1.0 / a
+                sum = del
+                for n = 1; n &lt;= GAMMQ_ITMAX; n++ </span><span class="cov8" title="1">{
+                        ap++
+                        del *= x / ap
+                        sum += del
+                        if math.Abs(del) &lt; math.Abs(sum)*GAMMQ_EPS </span><span class="cov8" title="1">{
+                                g.gamser = sum * math.Exp(-x+a*math.Log(x)-g.gln)
+                                return nil
+                        }</span>
+                }
+                <span class="cov0" title="0">return fmt.Errorf("a too large, ITMAX too small in routine gser")</span>
+        }
+}
+
+func (g *Gammq) gcf(a float64, x float64) error <span class="cov0" title="0">{
+        var i int64
+        var an, b, c, d, del, h float64
+
+        g.gln = g.gammln(a)
+        b = x + 1.0 - a
+        c = 1.0 / GAMMQ_FPMIN
+        d = 1.0 / b
+        h = d
+        for i = 1; i &lt;= GAMMQ_ITMAX; i++ </span><span class="cov0" title="0">{
+                an = -float64(i) * (float64(i) - a)
+                b += 2.0
+                d = an*d + b
+                if math.Abs(d) &lt; GAMMQ_FPMIN </span><span class="cov0" title="0">{
+                        d = GAMMQ_FPMIN
+                }</span>
+                <span class="cov0" title="0">c = b + an/c
+                if math.Abs(c) &lt; GAMMQ_FPMIN </span><span class="cov0" title="0">{
+                        c = GAMMQ_FPMIN
+                }</span>
+                <span class="cov0" title="0">d = 1.0 / d
+                del = d * c
+                h *= del
+                if math.Abs(del-1.0) &lt; GAMMQ_EPS </span><span class="cov0" title="0">{
+                        break</span>
+                }
+        }
+        <span class="cov0" title="0">if i &gt; GAMMQ_ITMAX </span><span class="cov0" title="0">{
+                return fmt.Errorf("a too large, ITMAX too small in gcf")
+        }</span>
+        <span class="cov0" title="0">g.gammcf = math.Exp(-x+a*math.Log(x)-g.gln) * h
+        return nil</span>
+}
+
+func (g *Gammq) gammln(xx float64) float64 <span class="cov8" title="1">{
+        var x, y, tmp, ser float64
+
+        cof := []float64{76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5}
+
+        var j int64
+
+        x = xx
+        y = x
+        tmp = x + 5.5
+        tmp -= (x + 0.5) * math.Log(tmp)
+        ser = 1.000000000190015
+        for j = 0; j &lt;= 5; j++ </span><span class="cov8" title="1">{
+                y++
+                ser += cof[j] / y
+        }</span>
+
+        <span class="cov8" title="1">return -tmp + math.Log(2.5066282746310005*ser/x)</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package imp
+
+// Some parts of this function aimed to test the ternary operator, though it does not exist on Go
+
+func Remainder(a int32, b int32) int32 <span class="cov8" title="1">{
+        var r int32 = 0 - 1
+        var cy int32 = 0
+        var ny int32 = 0
+
+        if a == 0 </span>{<span class="cov0" title="0">
+        }</span> else<span class="cov8" title="1"> if b == 0 </span>{<span class="cov0" title="0">
+        }</span> else<span class="cov8" title="1"> if a &gt; 0 </span><span class="cov8" title="1">{
+                if b &gt; 0 </span><span class="cov8" title="1">{
+                        for (a - ny) &gt;= b </span><span class="cov0" title="0">{
+                                ny = ny + b
+                                r = a - ny
+                                cy = cy + 1
+                        }</span>
+                } else<span class="cov0" title="0"> { // b&lt;0
+                        // for (a + ny) &gt;= math.Abs(b)
+                        for (a + ny) &gt;= abs(b) </span><span class="cov0" title="0">{
+                                ny = ny + b
+                                r = a + ny
+                                cy = cy - 1
+                        }</span>
+                }
+        } else<span class="cov0" title="0"> { // a&lt;0
+                if b &gt; 0 </span><span class="cov0" title="0">{
+                        // for math.Abs( a + ny ) &gt;= b
+                        for abs(a+ny) &gt;= b </span><span class="cov0" title="0">{
+                                ny = ny + b
+                                r = a + ny
+                                cy = cy - 1
+                        }</span>
+                } else<span class="cov0" title="0"> {
+                        for b &gt;= (a - ny) </span><span class="cov0" title="0">{
+                                ny = ny + b
+                                // r = math.Abs(a-ny);
+                                r = abs(a - ny)
+                                cy = cy + 1
+                        }</span>
+                }
+        }
+        <span class="cov8" title="1">return r</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package imp
+
+func TriangleClassify(a int32, b int32, c int32) int32 <span class="cov8" title="1">{
+        if a &lt;= 0 || b &lt;= 0 || c &lt;= 0 </span><span class="cov0" title="0">{
+                return 0
+        }</span>
+
+        <span class="cov8" title="1">if a == b &amp;&amp; b == c </span><span class="cov0" title="0">{
+                return 3
+        }</span>
+
+        <span class="cov8" title="1">m := max(a, max(b, c))
+        if (m == a &amp;&amp; m-b-c &gt;= 0) ||
+                (m == b &amp;&amp; m-a-c &gt;= 0) ||
+                (m == c &amp;&amp; m-a-b &gt;= 0) </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+
+        <span class="cov0" title="0">if a == b || b == c || a == c </span><span class="cov0" title="0">{
+                return 2
+        }</span>
+
+        <span class="cov0" title="0">return 1</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package imp
+
+func max(a int32, b int32) int32 <span class="cov8" title="1">{
+        if a &gt; b </span><span class="cov8" title="1">{
+                return a
+        }</span>
+        <span class="cov0" title="0">return b</span>
+}
+
+func abs(a int32) int32 <span class="cov0" title="0">{
+        if a &gt;= 0 </span><span class="cov0" title="0">{
+                return a
+        }</span>
+        <span class="cov0" title="0">return -a</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package src
+
+import (
+        "github.com/gorilla/mux"
+        "net/http"
+)
+
+func CreateServer() *mux.Router <span class="cov8" title="1">{
+        r := mux.NewRouter()
+        r.HandleFunc("/swagger.json", SwaggerHandler)
+
+        api := r.PathPrefix("/api").Subrouter()
+        api.HandleFunc("/health", func(_ http.ResponseWriter, _ *http.Request) </span><span class="cov8" title="1">{ return }</span>)
+        <span class="cov8" title="1">api.HandleFunc("/triangle/{a}/{b}/{c}", TriangleClassificationHandler)
+        api.HandleFunc("/bessj/{n}/{x}", BessJHandler)
+        api.HandleFunc("/expint/{n}/{x}", ExpintHandler)
+        api.HandleFunc("/fisher/{m}/{n}/{x}", FisherHandler)
+        api.HandleFunc("/gammq/{a}/{x}", GammqHandler)
+        api.HandleFunc("/remainder/{a}/{b}", RemainderHandler)
+
+        return r</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package src
+
+import (
+        "encoding/json"
+        "fmt"
+        "net/http"
+)
+
+func writeResponse(w http.ResponseWriter, r Dto, err error) <span class="cov8" title="1">{
+        if err != nil </span><span class="cov8" title="1">{
+                badRequestResponse(w, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">response, err := json.Marshal(r)
+        if err != nil </span><span class="cov8" title="1">{
+                fmt.Printf("[ERROR] Error encoding to json [object: %v]\n", r)
+                internalServerResponse(w)
+                return
+        }</span>
+
+        <span class="cov8" title="1">w.Header().Set("Content-Type", "application/json")
+        _, err = fmt.Fprintf(w, string(response))
+        if err != nil </span><span class="cov0" title="0">{
+                internalServerResponse(w)
+                return
+        }</span>
+}
+
+func internalServerResponse(w http.ResponseWriter) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusInternalServerError)
+}</span>
+
+func badRequestResponse(w http.ResponseWriter, msg string) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusBadRequest)
+        stringifyMsg := "\"" + msg + "\""
+        _, _ = fmt.Fprintf(w, stringifyMsg)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

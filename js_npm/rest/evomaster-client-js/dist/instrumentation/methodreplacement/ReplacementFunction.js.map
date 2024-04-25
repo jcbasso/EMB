@@ -1,0 +1,1 @@
+{"version":3,"file":"ReplacementFunction.js","sourceRoot":"","sources":["../../../src/instrumentation/methodreplacement/ReplacementFunction.ts"],"names":[],"mappings":";;AAEA,MAAqB,mBAAmB;IAKpC,YAAY,OAAiB,EAAE,YAAsB;QAEjD,IAAI,CAAC,MAAM,GAAG,OAAO,CAAC;QACtB,IAAI,CAAC,WAAW,GAAG,YAAY,CAAC;IACpC,CAAC;CAGJ;AAZD,sCAYC"}

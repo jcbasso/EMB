@@ -31,6 +31,7 @@ hs_err_pid*
 /temp/
 /dist.zip
 /dist/
+.DS_Store
 
 /jdk_8_maven/.idea
 /jdk_8_maven/temp
